@@ -4,7 +4,6 @@
   "description": "Logged-in browser sessions for AI agents: a CLI cookie vault that hands Claude Code, Codex and other browser agents the right account without showing them the cookies.",
   "scripts": {
     "build": "tsc",
-    "prepare": "tsc",
     "test": "npm run build && node --test --test-concurrency=1 test/*.test.mjs"
   },
   "repository": {
