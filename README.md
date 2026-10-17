@@ -40,7 +40,7 @@ The full version is [`skills/crumb/SKILL.md`](skills/crumb/SKILL.md). It install
 ## Install
 
 ```bash
-npm install -g github:exla-ai/crumb   # Node 22+
+npm install -g --install-links github:exla-ai/crumb   # Node 22+
 crumb setup                          # installs the skill for Claude Code (~/.claude/skills) and Codex (~/.agents/skills)
 ```
 
