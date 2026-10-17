@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/exla-ai/crumb/main/schema/v1/handle.schema.json",
+  "title": "Crumb Session Handle (crumb.handle v1)",
+  "description": "What an agent gets back from `crumb launch`: a running, already-logged-in browser it can drive over the Chrome DevTools Protocol. Contains no cookie values.",
+  "type": "object",
+  "required": ["format", "version", "id", "mode", "pid", "headless", "cdp", "startedAt"],
+  "properties": {
+    "format": { "const": "crumb.handle" },
+    "version": { "const": 1 },
+    "id": { "$ref": "session.schema.json#/$defs/accountId" },
+    "mode": { "$ref": "session.schema.json#/$defs/mode" },
+    "pid": { "type": "integer", "description": "PID of the supervisor process that owns the browser. Stopping it saves the session and closes the browser." },
+    "headless": { "type": "boolean" },
+    "home": { "type": "string" },
+    "cdp": {
+      "type": "object",
+      "required": ["http", "ws"],
+      "properties": {
+        "http": { "type": "string", "description": "CDP HTTP endpoint, e.g. http://127.0.0.1:53211 — pass to Playwright `connectOverCDP`, Playwright MCP `--cdp-endpoint`, Chrome DevTools MCP `--browserUrl`, browser-use `cdp_url`." },
+        "ws": { "type": "string", "description": "Browser-level WebSocket debugger URL." }
+      },
+      "additionalProperties": false
+    },
+    "autosave": {
+      "type": "object",
+      "properties": {
+        "intervalSeconds": { "type": "integer", "minimum": 0 },
+        "lastSavedAt": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "startedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

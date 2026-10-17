@@ -1,0 +1,11 @@
+{
+  "name": "crumb",
+  "owner": { "name": "exla-ai" },
+  "plugins": [
+    {
+      "name": "crumb",
+      "source": "./",
+      "description": "Logged-in browser sessions per account for browser agents, without exposing cookies."
+    }
+  ]
+}

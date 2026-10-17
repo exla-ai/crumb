@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/exla-ai/crumb/main/schema/v1/vault-entry.schema.json",
+  "title": "Crumb Vault Entry (crumb.vault-entry v1)",
+  "description": "At-rest file (`<site>/<account>.crumb`) holding one encrypted crumb.session plus its clear-text, value-free descriptor so accounts can be listed without the key.",
+  "type": "object",
+  "required": ["format", "version", "account", "cipher", "ciphertext"],
+  "properties": {
+    "format": { "const": "crumb.vault-entry" },
+    "version": { "const": 1 },
+    "account": { "$ref": "account.schema.json" },
+    "cipher": {
+      "type": "object",
+      "required": ["alg", "keyStore", "iv", "tag", "aad"],
+      "properties": {
+        "alg": { "const": "AES-256-GCM" },
+        "keyStore": { "enum": ["keychain", "secret-service", "file", "env"], "description": "Where the 256-bit vault key lives. Informational; the key itself is never stored here." },
+        "iv": { "type": "string", "contentEncoding": "base64", "description": "96-bit nonce, fresh per write." },
+        "tag": { "type": "string", "contentEncoding": "base64" },
+        "aad": { "const": "id", "description": "Additional authenticated data is the UTF-8 account id, binding the ciphertext to this account." }
+      },
+      "additionalProperties": false
+    },
+    "ciphertext": { "type": "string", "contentEncoding": "base64", "description": "AES-256-GCM encryption of the UTF-8 JSON crumb.session document." }
+  },
+  "additionalProperties": false
+}

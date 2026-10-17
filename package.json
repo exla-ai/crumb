@@ -1,0 +1,56 @@
+{
+  "name": "crumb",
+  "version": "0.1.0",
+  "description": "Logged-in browser sessions for AI agents: a CLI cookie vault that hands Claude Code, Codex and other browser agents the right account without showing them the cookies.",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "npm run build && node --test --test-concurrency=1 test/*.test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/exla-ai/crumb.git"
+  },
+  "keywords": [
+    "cookies",
+    "browser-agent",
+    "playwright",
+    "claude-code",
+    "codex",
+    "mcp",
+    "sessions",
+    "cdp"
+  ],
+  "author": "Viraat Das",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/exla-ai/crumb/issues"
+  },
+  "homepage": "https://github.com/exla-ai/crumb#readme",
+  "dependencies": {
+    "@steipete/sweet-cookie": "^0.4.4",
+    "commander": "^15.0.0",
+    "playwright-core": "^1.64.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "typescript": "^7.0.2"
+  },
+  "type": "module",
+  "bin": {
+    "crumb": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "schema",
+    "skills",
+    "hooks",
+    "SPEC.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  }
+}

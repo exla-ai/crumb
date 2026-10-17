@@ -1,0 +1,11 @@
+{
+  "description": "Keep agents out of the crumb vault; they must use the crumb CLI.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Glob|Bash|Edit|Write|NotebookEdit",
+        "hooks": [{ "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/guard.mjs\"" }]
+      }
+    ]
+  }
+}

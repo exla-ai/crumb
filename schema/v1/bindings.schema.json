@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/exla-ai/crumb/main/schema/v1/bindings.schema.json",
+  "title": "Crumb Project Bindings (.crumb.toml v1)",
+  "description": "Parsed form of a project's `.crumb.toml`, which pins which account an agent working in this directory should use for each site. Looked up from the current directory upward; the nearest file wins. Contains no secrets and is meant to be committed.",
+  "type": "object",
+  "required": ["version", "accounts"],
+  "properties": {
+    "version": { "const": 1 },
+    "accounts": {
+      "type": "object",
+      "description": "Map of site key to account id, e.g. { \"github\": \"github:work\" }.",
+      "propertyNames": { "$ref": "session.schema.json#/$defs/site" },
+      "additionalProperties": { "$ref": "session.schema.json#/$defs/accountId" }
+    }
+  },
+  "additionalProperties": false
+}

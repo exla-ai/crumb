@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/exla-ai/crumb/main/schema/v1/session.schema.json",
+  "title": "Crumb Session (crumb.session v1)",
+  "description": "A portable, logged-in browser session for exactly one account. Contains secret values: implementations MUST encrypt it at rest and MUST NOT print it to an agent. `state` is a superset of Playwright's storageState, so any tool that reads storageState can consume it after unknown fields are dropped.",
+  "type": "object",
+  "required": ["format", "version", "id", "site", "account", "mode", "state", "createdAt", "updatedAt"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "format": { "const": "crumb.session" },
+    "version": { "const": 1 },
+    "id": { "$ref": "#/$defs/accountId" },
+    "site": { "$ref": "#/$defs/site" },
+    "account": { "$ref": "#/$defs/accountName" },
+    "label": { "type": "string", "description": "Human-friendly name, e.g. \"Work GitHub (viraat@exla.ai)\". Never used for lookup." },
+    "home": { "type": "string", "format": "uri", "description": "Where an agent should land after the session is opened." },
+    "scope": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/domain" },
+      "uniqueItems": true,
+      "description": "Registrable domains this account is allowed to act on (e.g. [\"github.com\", \"githubusercontent.com\"]). Cookies outside the scope MAY be dropped on import."
+    },
+    "mode": { "$ref": "#/$defs/mode" },
+    "state": { "$ref": "#/$defs/state" },
+    "browser": { "$ref": "#/$defs/browser" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "policy": { "$ref": "#/$defs/policy" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "site": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,62}$", "description": "Short site key, e.g. \"github\" or \"google\"." },
+    "accountName": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,62}$", "description": "Account key within a site, e.g. \"work\"." },
+    "accountId": { "type": "string", "pattern": "^[a-z0-9][a-z0-9.-]{0,62}:[a-z0-9][a-z0-9._-]{0,62}$", "description": "<site>:<account>, e.g. \"github:work\"." },
+    "domain": { "type": "string", "pattern": "^[a-z0-9.-]+$" },
+    "mode": {
+      "enum": ["state", "profile"],
+      "description": "state: the session is fully described by `state` and can be injected into any fresh browser context (portable, many concurrent copies). profile: the session also lives in a persistent browser profile directory owned by the implementation (needed for device-bound sessions such as Google DBSC; one browser at a time)."
+    },
+    "sameSite": { "enum": ["Strict", "Lax", "None"] },
+    "cookie": {
+      "type": "object",
+      "required": ["name", "value", "domain", "path", "expires", "httpOnly", "secure", "sameSite"],
+      "properties": {
+        "name": { "type": "string" },
+        "value": { "type": "string" },
+        "domain": { "type": "string", "description": "Leading dot (\".github.com\") means the cookie also applies to subdomains; no dot means host-only." },
+        "path": { "type": "string" },
+        "expires": { "type": "number", "description": "Unix time in seconds; -1 for a session cookie." },
+        "httpOnly": { "type": "boolean" },
+        "secure": { "type": "boolean" },
+        "sameSite": { "$ref": "#/$defs/sameSite" },
+        "partitionKey": { "type": "string", "description": "CHIPS partition (top-level site) for partitioned cookies." }
+      },
+      "additionalProperties": true
+    },
+    "storageItem": {
+      "type": "object",
+      "required": ["name", "value"],
+      "properties": { "name": { "type": "string" }, "value": { "type": "string" } },
+      "additionalProperties": false
+    },
+    "origin": {
+      "type": "object",
+      "required": ["origin", "localStorage"],
+      "properties": {
+        "origin": { "type": "string", "description": "Serialized origin, e.g. \"https://github.com\"." },
+        "localStorage": { "type": "array", "items": { "$ref": "#/$defs/storageItem" } },
+        "sessionStorage": { "type": "array", "items": { "$ref": "#/$defs/storageItem" }, "description": "Optional. Captured for completeness; implementations MAY ignore it on injection." },
+        "indexedDB": { "type": "array", "description": "Optional. Opaque IndexedDB snapshot in Playwright's storageState format (needed for e.g. Firebase Auth)." }
+      },
+      "additionalProperties": true
+    },
+    "state": {
+      "type": "object",
+      "required": ["cookies", "origins"],
+      "properties": {
+        "cookies": { "type": "array", "items": { "$ref": "#/$defs/cookie" } },
+        "origins": { "type": "array", "items": { "$ref": "#/$defs/origin" } }
+      },
+      "additionalProperties": true
+    },
+    "browser": {
+      "type": "object",
+      "description": "Fingerprint hints from where the session was captured. Replaying a session with a very different user agent, IP or region can trip bot detection.",
+      "properties": {
+        "engine": { "enum": ["chromium", "firefox", "webkit"] },
+        "product": { "type": "string", "description": "e.g. \"chrome\", \"brave\", \"edge\"." },
+        "version": { "type": "string" },
+        "userAgent": { "type": "string" },
+        "platform": { "type": "string", "description": "Node-style platform where captured: darwin, linux, win32." }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source", "capturedAt"],
+      "properties": {
+        "source": { "enum": ["login", "import", "capture", "sync"], "description": "login: a human signed in inside a browser the implementation launched. import: copied from another browser or file. capture: snapshotted from a running browser. sync: written back after an agent run." },
+        "from": { "type": "string", "description": "Free-form origin detail, e.g. \"chrome:Profile 2\" or \"file:state.json\". Never contains secret values." },
+        "capturedAt": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "confirm": { "type": "boolean", "description": "Require a human confirmation before each launch." },
+        "allowExport": { "type": "boolean", "description": "When false, the raw session may not be exported to a file." }
+      },
+      "additionalProperties": false
+    }
+  }
+}

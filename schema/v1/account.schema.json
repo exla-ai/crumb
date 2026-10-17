@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/exla-ai/crumb/main/schema/v1/account.schema.json",
+  "title": "Crumb Account Descriptor (crumb.account v1)",
+  "description": "Value-free description of a stored account. Safe to show to agents: it never contains cookie or storage values. Returned by `crumb list --json` and stored in clear text in the vault entry header.",
+  "type": "object",
+  "required": ["format", "version", "id", "site", "account", "mode", "status", "cookies", "origins", "createdAt", "updatedAt"],
+  "properties": {
+    "format": { "const": "crumb.account" },
+    "version": { "const": 1 },
+    "id": { "$ref": "session.schema.json#/$defs/accountId" },
+    "site": { "$ref": "session.schema.json#/$defs/site" },
+    "account": { "$ref": "session.schema.json#/$defs/accountName" },
+    "label": { "type": "string" },
+    "home": { "type": "string" },
+    "scope": { "type": "array", "items": { "type": "string" } },
+    "mode": { "$ref": "session.schema.json#/$defs/mode" },
+    "status": {
+      "enum": ["valid", "expired", "empty", "logged-out"],
+      "description": "valid: has unexpired cookies. expired: every persistent cookie has expired and there are no session cookies. empty: nothing captured yet. logged-out: the last `check` landed on a login page."
+    },
+    "isDefault": { "type": "boolean", "description": "True when this is the default account for its site." },
+    "cookies": {
+      "type": "object",
+      "required": ["count"],
+      "properties": {
+        "count": { "type": "integer", "minimum": 0 },
+        "session": { "type": "integer", "minimum": 0, "description": "Cookies without an expiry." },
+        "httpOnly": { "type": "integer", "minimum": 0 },
+        "domains": { "type": "array", "items": { "type": "string" } },
+        "earliestExpiry": { "type": ["string", "null"], "format": "date-time" },
+        "latestExpiry": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "origins": { "type": "integer", "minimum": 0, "description": "Number of origins with stored web storage." },
+    "provenance": { "$ref": "session.schema.json#/$defs/provenance" },
+    "lastCheck": {
+      "type": "object",
+      "required": ["at", "result"],
+      "properties": {
+        "at": { "type": "string", "format": "date-time" },
+        "result": { "enum": ["logged-in", "logged-out", "unknown"] },
+        "url": { "type": "string", "description": "Final URL the check landed on." }
+      },
+      "additionalProperties": false
+    },
+    "session": { "$ref": "handle.schema.json", "description": "Present when a browser is currently running for this account." },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "lastUsedAt": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,10 @@
+{
+  "name": "crumb",
+  "version": "0.1.0",
+  "description": "Logged-in browser sessions per account (github:work, google:me) for browser agents, without exposing cookies. Bundles the crumb skill and a hook that keeps agents out of the vault.",
+  "author": { "name": "Viraat Das" },
+  "homepage": "https://github.com/exla-ai/crumb",
+  "repository": "https://github.com/exla-ai/crumb",
+  "license": "MIT",
+  "keywords": ["cookies", "browser", "sessions", "accounts", "playwright", "cdp"]
+}

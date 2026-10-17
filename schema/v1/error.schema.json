@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/exla-ai/crumb/main/schema/v1/error.schema.json",
+  "title": "Crumb Error (crumb.error v1)",
+  "description": "Machine-readable failure printed to stdout by any command run with --json. `needsHuman` tells an agent to stop and ask the user instead of retrying.",
+  "type": "object",
+  "required": ["format", "version", "code", "message", "needsHuman"],
+  "properties": {
+    "format": { "const": "crumb.error" },
+    "version": { "const": 1 },
+    "code": {
+      "enum": [
+        "INVALID_ID",
+        "INVALID_INPUT",
+        "NOT_FOUND",
+        "AMBIGUOUS",
+        "NEEDS_LOGIN",
+        "NO_DISPLAY",
+        "LOCKED",
+        "NOT_RUNNING",
+        "BROWSER_NOT_FOUND",
+        "IMPORT_FAILED",
+        "KEY_UNAVAILABLE",
+        "EXPORT_DENIED",
+        "INTERNAL"
+      ]
+    },
+    "message": { "type": "string" },
+    "hint": { "type": "string", "description": "Next command to run, if any." },
+    "needsHuman": { "type": "boolean" },
+    "candidates": { "type": "array", "items": { "type": "string" }, "description": "For AMBIGUOUS: the account ids to choose from." }
+  },
+  "additionalProperties": false
+}
